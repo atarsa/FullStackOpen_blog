@@ -19,7 +19,7 @@ const favouriteBlog = (blogs) => {
     let maxLikes = 0
     let favBlog = blogs[0]
 
-    blogs.forEach( (blog, i) => {
+    blogs.forEach( (blog) => {
       if (Number(blog.likes) > maxLikes){
         maxLikes = blog.likes
         favBlog = blog
@@ -64,9 +64,44 @@ const mostBlogs = (blogs) => {
   }
 }
 
+const mostLikes = blogs => {
+  if (blogs.length === 0) {
+    return null
+  } else {
+    // transform blog object so it contains only author and number of likes
+    let transformedBlogs = []
+
+    blogs.forEach(blog => {
+      let newBlog = _.pick(blog, ['author', 'likes'])   
+      transformedBlogs.push(newBlog)
+    })
+
+   let likesObj = {}
+
+   transformedBlogs.forEach(blog => {
+     if (likesObj[blog.author]){
+      likesObj[blog.author] += blog.likes
+     } else {
+      likesObj[blog.author] = blog.likes
+     }
+   })
+    
+   let mostLikedAuthor = _.maxBy(Object.keys(likesObj), o => likesObj[o])
+   
+   // return author with most likes
+    return {
+      "author": mostLikedAuthor,
+      "likes": likesObj[mostLikedAuthor]
+      }
+    
+  }
+}
+
+
 module.exports = {
   totalLikes,
   favouriteBlog,
-  mostBlogs
+  mostBlogs,
+  mostLikes
 }
 
