@@ -1,6 +1,7 @@
-const listHelper = require('../utils/list_helper').dummy
+
 const totalLikes = require('../utils/list_helper').totalLikes
 const favouriteBlog = require('../utils/list_helper').favouriteBlog
+const mostBlogs = require('../utils/list_helper').mostBlogs
 
 
 const listWithOneBlog = [
@@ -65,16 +66,7 @@ const listWithManyBlogs = [
   } 
 ]
 
-test('dummy returns one', () => {
-  const blogs = []
-
-  const result = listHelper(blogs)
-  expect(result).toBe(1)
-})
-
 describe('total likes', () => {
-
-  
 
   test('of empty list is zero', () => {
     expect(totalLikes([])).toBe(0)
@@ -122,6 +114,29 @@ describe('favourite blog', () => {
   test('is the blog with highest lieks number', () => {
     expect(favouriteBlog(listWithManyBlogs)).toEqual(favBlogOfMany)
   })
+})
+
+describe('author who has the largest amount of blogs', () => {
+  const mostBlogsOfOne = {
+    author: 'Edsger W. Dijkstra',
+    blogs: 1
+  }
+
+  const mostBlogsOfMany = {
+    author: "Robert C. Martin",
+    blogs: 3
+  }
 
 
+  test('of empty list is null', () => {
+    expect(mostBlogs([])).toBe(null)
+  })
+
+  test('of one blog is that  blog\'s author', () => {
+    expect(mostBlogs(listWithOneBlog)).toEqual(mostBlogsOfOne)
+  })
+
+  test('of blogs list', () => {
+    expect(mostBlogs(listWithManyBlogs)).toEqual(mostBlogsOfMany)
+  })
 })
