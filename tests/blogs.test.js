@@ -70,10 +70,34 @@ test('all blogs are returned', async () => {
   expect(response.body.length).toBe(initialBlogs.length)
 })
 
-test.only('each blog has "id" property', async () => {
+test('each blog has "id" property', async () => {
   const response = await api.get('/api/blogs')
   expect(response.body[0].id).toBeDefined()
 })
+
+test.only('add a new blog successfully', async () => {
+  const newBlog = {
+    title: 'JavaScript: The Good Parts',
+    author: 'Crockford D.',
+    url: 'https://7chan.org/pr/src/OReilly_JavaScript_The_Good_Parts_May_2008.pdf',
+    likes: 5
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+  
+  const response = await api.get('/api/blogs')
+  const titles = response.body.map(r => r.title)
+  
+  expect(response.body.length).toBe(initialBlogs.length + 1)
+  expect(titles).toContain(
+    'Go To Statement Considered Harmful'
+  )
+})
+
 
 afterAll(() => {
   mongoose.connection.close()
