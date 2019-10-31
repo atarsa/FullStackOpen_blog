@@ -75,7 +75,7 @@ test('each blog has "id" property', async () => {
   expect(response.body[0].id).toBeDefined()
 })
 
-test.only('add a new blog successfully', async () => {
+test('add a new blog successfully', async () => {
   const newBlog = {
     title: 'JavaScript: The Good Parts',
     author: 'Crockford D.',
@@ -96,6 +96,21 @@ test.only('add a new blog successfully', async () => {
   expect(titles).toContain(
     'Go To Statement Considered Harmful'
   )
+})
+
+test.only('Each added blog has a "likes" property', async () => {
+  const newBlog = {
+    title: 'JavaScript: The Good Parts',
+    author: 'Crockford D.',
+    url: 'https://7chan.org/pr/src/OReilly_JavaScript_The_Good_Parts_May_2008.pdf'    
+  } 
+  
+  const response = await api
+    .post('/api/blogs')
+    .send(newBlog)
+
+  expect(response.status).toBe(200)
+  expect(response.body.likes).toBeDefined()
 })
 
 
