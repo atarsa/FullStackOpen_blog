@@ -10,16 +10,25 @@ blogsRouter.get('/', async (request, response) => {
 
 blogsRouter.post('/', async (request, response) => {
   const body = request.body
-  const blog = new Blog({
-    title: body.title,
-    author: body.author,
-    url: body.url,
-    likes: body.likes === undefined ? 0 : body.likes
-  })
 
-  const savedBlog = await blog.save()
+  if (body.title && body.url){
+    const blog = new Blog({
+      title: body.title,
+      author: body.author,
+      url: body.url,
+      likes: body.likes === undefined ? 0 : body.likes
+    })
   
-  response.json(savedBlog.toJSON())
+    const savedBlog = await blog.save()
+    
+    response.json(savedBlog.toJSON())
+  } else {
+    response
+      .status(400)
+      .send('Title and url are required')
+      
+  }
+  
     
 })
 

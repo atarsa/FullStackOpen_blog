@@ -65,17 +65,17 @@ beforeEach(async () => {
   }
 })
 
-test('all blogs are returned', async () => {
+test('All blogs are returned', async () => {
   const response = await api.get('/api/blogs')
   expect(response.body.length).toBe(initialBlogs.length)
 })
 
-test('each blog has "id" property', async () => {
+test('Each blog has "id" property', async () => {
   const response = await api.get('/api/blogs')
   expect(response.body[0].id).toBeDefined()
 })
 
-test('add a new blog successfully', async () => {
+test('Add a new blog successfully', async () => {
   const newBlog = {
     title: 'JavaScript: The Good Parts',
     author: 'Crockford D.',
@@ -98,7 +98,7 @@ test('add a new blog successfully', async () => {
   )
 })
 
-test.only('Each added blog has a "likes" property', async () => {
+test('Each added blog has a "likes" property', async () => {
   const newBlog = {
     title: 'JavaScript: The Good Parts',
     author: 'Crockford D.',
@@ -113,6 +113,17 @@ test.only('Each added blog has a "likes" property', async () => {
   expect(response.body.likes).toBeDefined()
 })
 
+test.only('Don\'t submit blog without "title" and "url" properties', async () => {
+  const newBlog = {}
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+    
+  const response = await api.get('/api/blogs')
+  expect(response.body.length).toBe(initialBlogs.length)
+})
 
 afterAll(() => {
   mongoose.connection.close()
