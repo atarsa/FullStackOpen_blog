@@ -113,7 +113,7 @@ test('Each added blog has a "likes" property', async () => {
   expect(response.body.likes).toBeDefined()
 })
 
-test.only('Don\'t submit blog without "title" and "url" properties', async () => {
+test('Don\'t submit blog without "title" and "url" properties', async () => {
   const newBlog = {}
 
   await api
@@ -124,6 +124,32 @@ test.only('Don\'t submit blog without "title" and "url" properties', async () =>
   const response = await api.get('/api/blogs')
   expect(response.body.length).toBe(initialBlogs.length)
 })
+
+describe('Delete blog', () => {
+  test.only('succeeds with status code 204 if id is valid', async () => {
+    const blogToDelete =  {
+        id: "5a422a851b54a676234d17f7",
+        title: "React patterns",
+        author: "Michael Chan",
+        url: "https://reactpatterns.com/",
+        likes: 7      
+    }
+    
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .expect(204)
+
+    const blogsAtEnd = await Blog.find({})
+    console.log(blogsAtEnd.length);
+    expect(blogsAtEnd.length).toBe(initialBlogs.length - 1)
+
+    const titles = blogsAtEnd.map(b => b.title)
+
+    expect(titles).not.toContain(blogToDelete.title)
+    
+  })
+})
+
 
 afterAll(() => {
   mongoose.connection.close()

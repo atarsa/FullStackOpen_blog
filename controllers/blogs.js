@@ -27,10 +27,17 @@ blogsRouter.post('/', async (request, response) => {
       .status(400)
       .send('Title and url are required')
       
-  }
-  
-    
+  }  
 })
 
+blogsRouter.delete('/:id', async (request, response) => {
+  try {
+    await Blog.findByIdAndRemove(request.params.id)
+    response.status(204).end()
+  } catch (exception){
+    console.log(exception);
+    response.status(400).end()
+  }
+})
 
 module.exports = blogsRouter
