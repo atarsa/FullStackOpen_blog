@@ -126,7 +126,7 @@ test('Don\'t submit blog without "title" and "url" properties', async () => {
 })
 
 describe('Delete blog', () => {
-  test.only('succeeds with status code 204 if id is valid', async () => {
+  test('succeeds with status code 204 if id is valid', async () => {
     const blogToDelete =  {
         id: "5a422a851b54a676234d17f7",
         title: "React patterns",
@@ -150,6 +150,38 @@ describe('Delete blog', () => {
   })
 })
 
+describe('Update blog', () => {
+  const blogToUpdate =  {
+    id: "5a422a851b54a676234d17f7",
+    title: "React patterns",
+    author: "Michael Chan",
+    url: "https://reactpatterns.com/",
+    likes: 7      
+  }
+
+  const updateBlog = {
+    likes: 8
+  }
+
+  test('succeeds with status code 200 if id is valid', async() => {
+
+    await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(updateBlog)
+      .expect(200)
+
+  })
+
+  test('returns updated note when updating likes', async() => {
+    await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(updateBlog)
+
+    const updatedBlog = await Blog.findById(blogToUpdate.id)
+    expect(updatedBlog.likes).toBe(updateBlog.likes)
+
+  })
+})
 
 afterAll(() => {
   mongoose.connection.close()
