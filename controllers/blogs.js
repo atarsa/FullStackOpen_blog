@@ -2,6 +2,16 @@ const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
 
+const jwt = require('jsonwebtoken')
+
+const getTokenFrom = request => {
+  const authorization = request.get('authorization')
+  if (authorization && authorization.toLowerCase().startsWith('bearer ')){
+    return authorization.substring(7)
+  }
+  return null
+}
+
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog
     .find({})
@@ -11,31 +21,41 @@ blogsRouter.get('/', async (request, response) => {
   
 })
 
-blogsRouter.post('/', async (request, response) => {
+blogsRouter.post('/', async (request, response, next) => {
   const body = request.body
 
-  const user = await User.findById(body.userId)
+  const token = getTokenFrom(request)
 
-  if (body.title && body.url){
-    const blog = new Blog({
-      title: body.title,
-      author: body.author,
-      url: body.url,
-      likes: body.likes === undefined ? 0 : body.likes,
-      user: user._id
-    })
-  
-    const savedBlog = await blog.save()
-    user.blogs = user.blogs.concat(savedBlog._id)
-    await user.save()
-    response.json(savedBlog.toJSON())
+  try {
+    const decodedToken = jwt.verify(token, process.env.SECRET)
+    if (!token || !decodedToken.id){
+      return response.status(401).json({ error: 'token missing or invalid'})
+    }
 
-  } else {
-    response
-      .status(400)
-      .send('Title and url are required')
+    const user = await User.findById(body.userId)
+
+    if (body.title && body.url){
+      const blog = new Blog({
+        title: body.title,
+        author: body.author,
+        url: body.url,
+        likes: body.likes === undefined ? 0 : body.likes,
+        user: user._id
+      })
+    
+      const savedBlog = await blog.save()
+      user.blogs = user.blogs.concat(savedBlog._id)
+      await user.save()
+      response.json(savedBlog.toJSON())
+    } else {
+      response
+        .status(400)
+        .send('Title and url are required')
+    } 
       
-  }  
+  } catch (exception) {
+      next(exception)
+  } 
 })
 
 blogsRouter.delete('/:id', async (request, response) => {

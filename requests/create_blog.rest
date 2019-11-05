@@ -1,9 +1,11 @@
 POST http://localhost:3003/api/blogs
 content-type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJhZGVrIiwiaWQiOiI1ZGMwOGFiYTBiZTk5MzNiMjA0MzMzYzciLCJpYXQiOjE1NzI5NTQyOTh9.PHOY7sU26S70XrT8DjXbhlD6mjgyDU0zx5B9KnQlLN0
 
 {
   "title": "POST test",
   "author": "AT",
   "url": "http://test/String",
-  "likes": 2
+  "likes": 2,
+  "userId": "5dc08aba0be9933b204333c7"
 }
