@@ -24,7 +24,8 @@ blogsRouter.post('/', async (request, response, next) => {
       return response.status(401).json({ error: 'token missing or invalid'})
     }
 
-    const user = await User.findById(body.userId)
+    console.log('decoded Token', decodedToken);
+    const user = await User.findById(decodedToken.id)
 
     if (body.title && body.url){
       const blog = new Blog({
@@ -51,9 +52,36 @@ blogsRouter.post('/', async (request, response, next) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
+  const token  = request.token
+       
   try {
-    await Blog.findByIdAndRemove(request.params.id)
-    response.status(204).end()
+    if (token !== undefined){
+      const decodedToken = jwt.verify(token, process.env.SECRET)
+      
+      if (decodedToken.id){
+        const userId = decodedToken.id
+        const blog = await Blog.findById(request.params.id)
+        
+        // check if user has created this blog
+        if ( blog.user.toString() === userId.toString()){
+          await Blog.findByIdAndRemove(request.params.id)
+          response.status(204).end()
+        } else {
+          response.status(401).json({ error: 'only authors can delete notes'})
+        }
+                
+        
+      } else {
+        return response
+          .status(401)
+          .json({ error: 'token missing or invalid'})
+      }
+    } else {
+      return response
+          .status(401)
+          .json({ error: 'token missing or invalid'})
+    }
+   
   } catch (exception){
     console.log(exception);
     response.status(400).end()
