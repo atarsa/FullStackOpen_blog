@@ -57,6 +57,9 @@ const initialBlogs = [
   } 
 ]
 
+let savedUser = {
+}
+
 beforeEach(async () => {
   await Blog.deleteMany({})
 
@@ -64,6 +67,10 @@ beforeEach(async () => {
     let blogObject = new Blog(blog)
     await blogObject.save()
   }
+  
+  await User.deleteMany({})
+  const user = new User({ username: 'root', password: 'sekret' })
+  savedUser = await user.save()
 })
 
 test('All blogs are returned', async () => {
@@ -81,7 +88,8 @@ test('Add a new blog successfully', async () => {
     title: 'JavaScript: The Good Parts',
     author: 'Crockford D.',
     url: 'https://7chan.org/pr/src/OReilly_JavaScript_The_Good_Parts_May_2008.pdf',
-    likes: 5
+    likes: 5,
+    userId: `${savedUser._id}`
   }
 
   await api
@@ -103,7 +111,8 @@ test('Each added blog has a "likes" property', async () => {
   const newBlog = {
     title: 'JavaScript: The Good Parts',
     author: 'Crockford D.',
-    url: 'https://7chan.org/pr/src/OReilly_JavaScript_The_Good_Parts_May_2008.pdf'    
+    url: 'https://7chan.org/pr/src/OReilly_JavaScript_The_Good_Parts_May_2008.pdf',
+    userId: `${savedUser._id}`    
   } 
   
   const response = await api
